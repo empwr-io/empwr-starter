@@ -1,0 +1,7 @@
+# One line ending everywhere. Without this, a template cloned on Windows and edited
+# on a Mac produces diffs where every line changed and nothing did.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.pdf binary
