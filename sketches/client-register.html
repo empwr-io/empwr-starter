@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en-AU"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Client register - sketch</title>
+<style>
+  :root{
+    --bg:#F5F4F1; --surface:#FFFFFF; --surface-2:#EFEDE9;
+    --fg:#14140F; --fg-dim:#4C4A44; --fg-mute:#807D75;
+    --line:rgba(0,0,0,.12); --line-soft:rgba(0,0,0,.06);
+    --accent:#2F5D62; --accent-soft:#E4EDEE;
+    --good:#2F6B45; --warn:#8A6212; --crit:#9B3A2C;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 var(--sans)}
+  .app{display:grid;grid-template-columns:212px 1fr;min-height:100vh}
+  .rail{background:var(--surface);border-right:1px solid var(--line);padding:18px 0;display:flex;flex-direction:column}
+  .mark{font-weight:700;letter-spacing:-.02em;font-size:16px;padding:0 18px 18px}
+  .rail h6{margin:14px 18px 6px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-mute);font-weight:600}
+  .rail a{display:block;padding:7px 18px;color:var(--fg-dim);text-decoration:none;border-left:2px solid transparent}
+  .rail a.on{background:var(--accent-soft);border-left-color:var(--accent);color:var(--fg);font-weight:600}
+  .rail .me{margin-top:auto;padding:14px 18px 0;border-top:1px solid var(--line-soft);font-size:12px;color:var(--fg-mute)}
+
+  .head{display:flex;align-items:center;gap:14px;padding:16px 26px;border-bottom:1px solid var(--line);background:var(--surface)}
+  .head h1{margin:0;font-size:19px;font-weight:700}
+  .head .sp{flex:1}
+  .head .stamp{font-size:11.5px;color:var(--fg-mute)}
+  .btn{border:1px solid var(--line);background:transparent;border-radius:4px;padding:7px 13px;font:inherit;font-size:13px;cursor:pointer}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  main{padding:22px 26px 60px}
+
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px 22px;margin-bottom:22px}
+  .tile{border-left:2px solid var(--line);padding-left:12px}
+  .tile.act{border-left-color:var(--warn);cursor:pointer}
+  .tile .k{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--fg-mute)}
+  .tile .v{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+  .tile .b{font-size:12px;color:var(--fg-dim)}
+
+  .bar{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+  .chip{border:1px solid var(--line);border-radius:99px;padding:4px 11px;font-size:12.5px;background:var(--surface);cursor:pointer}
+  .chip.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+  .chip.warn{border-color:var(--warn);color:var(--warn)}
+  input[type=search]{flex:1;min-width:180px;padding:7px 11px;border:1px solid var(--line);border-radius:4px;font:inherit;background:var(--surface)}
+
+  table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line);border-radius:5px}
+  th{text-align:left;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-mute);
+     padding:9px 12px;border-bottom:1px solid var(--line);font-weight:600;white-space:nowrap}
+  td{padding:10px 12px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+  tr:last-child td{border-bottom:0}
+  .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .nm{font-weight:600}
+  .sub{display:block;font-size:11.5px;color:var(--fg-mute)}
+  .pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--fg-dim)}
+  .miss{color:var(--warn);border-color:var(--warn);background:#FBF4E4}
+  .assign{border:1px dashed var(--line);border-radius:4px;padding:3px 9px;font-size:12px;color:var(--fg-mute);background:transparent;cursor:pointer}
+  .assign:hover{border-color:var(--accent);color:var(--accent)}
+  .note{margin:18px 0 0;padding:12px 15px;border-left:2px solid var(--accent);background:var(--accent-soft);font-size:13px;color:var(--fg-dim);max-width:70ch}
+</style></head><body>
+<div class="app">
+  <nav class="rail">
+    <div class="mark">Your Firm</div>
+    <h6>Tools</h6>
+    <a href="#">Home</a>
+    <a href="#" class="on">Clients</a>
+    <a href="#">Reports</a>
+    <h6>Admin</h6>
+    <a href="#">Team</a>
+    <div class="me">sam@yourfirm.com.au<br>Administrator</div>
+  </nav>
+
+  <div>
+    <div class="head">
+      <h1>Client register</h1>
+      <span class="sp"></span>
+      <span class="stamp">Imported 08/09/2026, 6:04am &middot; 612 rows</span>
+      <button class="btn">Import CSV</button>
+      <button class="btn primary">Add client</button>
+    </div>
+
+    <main>
+      <div class="tiles">
+        <div class="tile"><span class="k">Active clients</span><span class="v">612</span><span class="b">across 187 groups</span></div>
+        <div class="tile"><span class="k">Annual value</span><span class="v">$1,284,900</span><span class="b">$2,100 average</span></div>
+        <div class="tile act"><span class="k">No group</span><span class="v">431</span><span class="b">Click to fix these</span></div>
+        <div class="tile act"><span class="k">No owner</span><span class="v">508</span><span class="b">Click to fix these</span></div>
+        <div class="tile"><span class="k">Top 5 share</span><span class="v">6.2%</span><span class="b">Low concentration</span></div>
+      </div>
+
+      <div class="bar">
+        <input type="search" placeholder="Search clients, groups or ABN">
+        <span class="chip on">Active</span>
+        <span class="chip">Prospect</span>
+        <span class="chip">Archived</span>
+        <span class="chip warn">No group (431)</span>
+        <span class="chip warn">No owner (508)</span>
+      </div>
+
+      <table>
+        <thead><tr>
+          <th>Client</th><th>Type</th><th>Group</th><th>Owner</th>
+          <th class="num">Services</th><th class="num">Annual value</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td class="nm">Brightwater Constructions Pty Ltd<span class="sub">ABN 41 622 815 903</span></td>
+            <td><span class="pill">Company</span></td>
+            <td>Brightwater Group</td>
+            <td>Priya Raman</td>
+            <td class="num">4</td><td class="num">$8,940</td>
+          </tr>
+          <tr>
+            <td class="nm">The Brightwater Family Trust</td>
+            <td><span class="pill">Trust</span></td>
+            <td>Brightwater Group</td>
+            <td>Priya Raman</td>
+            <td class="num">2</td><td class="num">$3,150</td>
+          </tr>
+          <tr>
+            <td class="nm">Marchetti, Elena<span class="sub">Source group: (blank)</span></td>
+            <td><span class="pill">Individual</span></td>
+            <td><button class="assign">+ Assign group</button></td>
+            <td><button class="assign">+ Assign owner</button></td>
+            <td class="num">1</td><td class="num">$385</td>
+          </tr>
+          <tr>
+            <td class="nm">Kalgoorlie Freight Services<span class="sub">Source manager: (blank)</span></td>
+            <td><span class="pill">Sole trader</span></td>
+            <td>Kalgoorlie Freight</td>
+            <td><button class="assign">+ Assign owner</button></td>
+            <td class="num">3</td><td class="num">$4,620</td>
+          </tr>
+          <tr>
+            <td class="nm">Hollis &amp; Nair Superannuation Fund</td>
+            <td><span class="pill">SMSF</span></td>
+            <td>Hollis Nair</td>
+            <td>Daniel Okafor</td>
+            <td class="num">2</td><td class="num">$3,400</td>
+          </tr>
+          <tr>
+            <td class="nm">Tan, Wei Lin</td>
+            <td><span class="pill">Individual</span></td>
+            <td><span class="pill miss">No group</span></td>
+            <td>Priya Raman</td>
+            <td class="num">1</td><td class="num">$0</td>
+          </tr>
+          <tr>
+            <td class="nm">Redgum Joinery Pty Ltd<span class="sub">Archived 30/06/2026</span></td>
+            <td><span class="pill">Company</span></td>
+            <td>Redgum Group</td>
+            <td>Daniel Okafor</td>
+            <td class="num">0</td><td class="num">$0</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="note"><strong>Why the awkward rows are in this sketch.</strong> A client with
+      no group, one with no owner, one at zero dollars and one archived. Those four are where
+      the design actually gets decided, and a sketch that shows only tidy rows will produce a
+      screen that falls apart on real data.</p>
+    </main>
+  </div>
+</div>
+</body></html>

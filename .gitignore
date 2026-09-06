@@ -1,0 +1,19 @@
+node_modules/
+dist/
+build/
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+supabase/.temp/
+supabase/.branches/
+
+# Never commit exports of real client data. Put them here and they stay out.
+/data/
+*.csv
+!sketches/**/*.csv
