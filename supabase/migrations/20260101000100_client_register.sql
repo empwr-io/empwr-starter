@@ -1,7 +1,8 @@
 -- =============================================================================
 -- MODULE ONE: the client and revenue register.
 -- Every client, the group they belong to, who owns them, and what they pay.
--- Run after the foundation. Clear the SQL editor first.
+--
+-- SAFE TO RUN TWICE. Run after the foundation. Clear the SQL editor first.
 --
 -- DESIGN NOTE, and it is the important one.
 -- Most practice management and proposal systems turn out to be missing the very
@@ -13,9 +14,9 @@
 
 -- ---------- the team ---------------------------------------------------------
 -- ONE canonical row per person, referenced everywhere by id. Never join people on
--- a name string: the day someone appears as "Sam" in one place and "Samantha Rowe"
--- in another, half your numbers quietly disappear.
-create table public.staff (
+-- a name string: the day somebody appears as "Sam" in one place and "Samantha
+-- Rowe" in another, half your numbers quietly disappear with no error.
+create table if not exists public.staff (
   id           uuid primary key default gen_random_uuid(),
   full_name    text not null,
   email        text unique,
@@ -27,17 +28,18 @@ create table public.staff (
 );
 
 -- ---------- groups -----------------------------------------------------------
-create table public.client_groups (
+create table if not exists public.client_groups (
   id         uuid primary key default gen_random_uuid(),
   name       text not null,
   notes      text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
-create unique index client_groups_name_uniq on public.client_groups (lower(name));
+create unique index if not exists client_groups_name_uniq
+  on public.client_groups (lower(name));
 
 -- ---------- clients ----------------------------------------------------------
-create table public.clients (
+create table if not exists public.clients (
   id                   uuid primary key default gen_random_uuid(),
   name                 text not null,
   entity_type          text,           -- individual | sole_trader | company | trust | partnership | smsf
@@ -59,16 +61,19 @@ create table public.clients (
   created_at           timestamptz not null default now(),
   updated_at           timestamptz not null default now()
 );
-create unique index clients_source_uniq on public.clients (source_system, source_id)
-  where source_id is not null;
-create index clients_group_idx on public.clients (group_id);
-create index clients_status_idx on public.clients (status);
-create index clients_name_idx on public.clients (lower(name));
+create unique index if not exists clients_source_uniq
+  on public.clients (source_system, source_id) where source_id is not null;
+create index if not exists clients_group_idx  on public.clients (group_id);
+create index if not exists clients_status_idx on public.clients (status);
+create index if not exists clients_name_idx   on public.clients (lower(name));
 
 -- ---------- ownership --------------------------------------------------------
-create type public.owner_role as enum ('partner', 'manager', 'bookkeeper');
+do $$ begin
+  create type public.owner_role as enum ('partner', 'manager', 'bookkeeper');
+exception when duplicate_object then null;
+end $$;
 
-create table public.client_owners (
+create table if not exists public.client_owners (
   id         uuid primary key default gen_random_uuid(),
   client_id  uuid not null references public.clients(id) on delete cascade,
   staff_id   uuid not null references public.staff(id) on delete cascade,
@@ -76,10 +81,10 @@ create table public.client_owners (
   created_at timestamptz not null default now(),
   unique (client_id, owner_role)
 );
-create index client_owners_staff_idx on public.client_owners (staff_id);
+create index if not exists client_owners_staff_idx on public.client_owners (staff_id);
 
 -- ---------- services ---------------------------------------------------------
-create table public.service_catalogue (
+create table if not exists public.service_catalogue (
   id            uuid primary key default gen_random_uuid(),
   name          text not null,
   category      text,           -- yours to assign; source systems rarely carry one
@@ -92,11 +97,12 @@ create table public.service_catalogue (
   created_at    timestamptz not null default now(),
   updated_at    timestamptz not null default now()
 );
-create unique index service_catalogue_source_uniq on public.service_catalogue (source_system, source_id)
-  where source_id is not null;
-create index service_catalogue_category_idx on public.service_catalogue (category);
+create unique index if not exists service_catalogue_source_uniq
+  on public.service_catalogue (source_system, source_id) where source_id is not null;
+create index if not exists service_catalogue_category_idx
+  on public.service_catalogue (category);
 
-create table public.client_services (
+create table if not exists public.client_services (
   id               uuid primary key default gen_random_uuid(),
   client_id        uuid not null references public.clients(id) on delete cascade,
   service_id       uuid not null references public.service_catalogue(id) on delete restrict,
@@ -110,13 +116,15 @@ create table public.client_services (
   created_at       timestamptz not null default now(),
   updated_at       timestamptz not null default now()
 );
-create index client_services_client_idx on public.client_services (client_id) where is_active;
-create index client_services_service_idx on public.client_services (service_id) where is_active;
+create index if not exists client_services_client_idx
+  on public.client_services (client_id) where is_active;
+create index if not exists client_services_service_idx
+  on public.client_services (service_id) where is_active;
 
 -- ---------- import audit -----------------------------------------------------
 -- A sync that writes half the rows and reports success produces a report that is
 -- confidently wrong. Every load writes a row here, including the failures.
-create table public.data_imports (
+create table if not exists public.data_imports (
   id             uuid primary key default gen_random_uuid(),
   source_system  text not null,
   file_name      text,
@@ -129,19 +137,20 @@ create table public.data_imports (
   imported_by    uuid references auth.users(id),
   imported_at    timestamptz not null default now()
 );
-create index data_imports_at_idx on public.data_imports (imported_at desc);
+create index if not exists data_imports_at_idx on public.data_imports (imported_at desc);
 
 -- ---------- updated_at triggers ---------------------------------------------
-create trigger staff_updated before update on public.staff
-  for each row execute function public.set_updated_at();
-create trigger client_groups_updated before update on public.client_groups
-  for each row execute function public.set_updated_at();
-create trigger clients_updated before update on public.clients
-  for each row execute function public.set_updated_at();
-create trigger service_catalogue_updated before update on public.service_catalogue
-  for each row execute function public.set_updated_at();
-create trigger client_services_updated before update on public.client_services
-  for each row execute function public.set_updated_at();
+do $$
+declare t text;
+begin
+  foreach t in array array['staff','client_groups','clients','service_catalogue','client_services']
+  loop
+    execute format('drop trigger if exists %I on public.%I', t || '_updated', t);
+    execute format('create trigger %I before update on public.%I '
+                   'for each row execute function public.set_updated_at()',
+                   t || '_updated', t);
+  end loop;
+end $$;
 
 -- =============================================================================
 -- ROW LEVEL SECURITY
@@ -154,12 +163,14 @@ create trigger client_services_updated before update on public.client_services
 alter table public.clients enable row level security;
 
 -- 2. Let the right staff in.
+drop policy if exists area_access on public.clients;
 create policy area_access on public.clients
   for all to authenticated
   using      (public.has_area(auth.uid(), 'clients'::public.app_area))
   with check (public.has_area(auth.uid(), 'clients'::public.app_area));
 
 -- 3. Let your own server functions in.
+drop policy if exists service_access on public.clients;
 create policy service_access on public.clients
   for all to service_role using (true) with check (true);
 
@@ -172,11 +183,15 @@ begin
     'service_catalogue', 'client_services', 'data_imports'
   ] loop
     execute format('alter table public.%I enable row level security', t);
+
+    execute format('drop policy if exists area_access on public.%I', t);
     execute format(
       'create policy area_access on public.%I for all to authenticated '
       'using (public.has_area(auth.uid(), %L::public.app_area)) '
       'with check (public.has_area(auth.uid(), %L::public.app_area))',
       t, 'clients', 'clients');
+
+    execute format('drop policy if exists service_access on public.%I', t);
     execute format(
       'create policy service_access on public.%I for all to service_role '
       'using (true) with check (true)', t);
@@ -189,7 +204,8 @@ end $$;
 
 -- security_invoker means the caller's permissions apply, not the view owner's.
 -- Without it a view is a hole straight through your row level security.
-create or replace view public.v_client_register
+drop view if exists public.v_client_register;
+create view public.v_client_register
 with (security_invoker = on) as
 select
   c.id,
@@ -246,3 +262,8 @@ grant execute on function public.register_summary() to authenticated;
 
 comment on function public.register_summary() is
   'Headline figures for the client register. SECURITY INVOKER on purpose: the caller must hold the clients area.';
+
+-- ---------- did it work? -----------------------------------------------------
+--   select tablename, rowsecurity from pg_tables
+--   where schemaname = 'public' order by tablename;
+--   select public.register_summary();

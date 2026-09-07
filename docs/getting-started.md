@@ -7,22 +7,41 @@ Supabase in Sydney, and a Lovable account.
 
 ---
 
+## 0. Already started? Read this first
+
+If you have already created a Lovable project and a Supabase database from the
+foundations install, **do not start again**. You do not want a second repository.
+
+Bring this into the project you already have instead. Open Claude Code in your project
+folder and give it this:
+
+> Clone https://github.com/empwr-io/empwr-starter into a temporary folder outside this
+> project, then copy its `supabase/`, `src/lib/`, `config/`, `docs/` and `sketches/`
+> folders into this project. Do not overwrite anything Lovable generated, and do not
+> copy its README, .git folder or .gitignore over mine. Then tell me what you copied and
+> delete the temporary folder.
+
+Both migrations are **safe to run twice**, so if you already ran the foundation SQL from
+the install document, run the foundation migration anyway. It adds the few pieces the
+install document did not have and changes nothing that already exists.
+
+Then skip to stage 4.
+
+---
+
 ## 1. Take your own copy
 
 This is a template, not a dependency. You want your own repository with your own
 history, not a fork that tracks ours.
 
+On GitHub, open https://github.com/empwr-io/empwr-starter and click **Use this
+template**. That gives you your own repository with a clean history, rather than a fork
+that stays tied to ours. Name it after your firm, then:
+
 ```
 cd ~/dev
-git clone https://github.com/YOUR-ORG/empwr-starter.git yourfirm-platform
+git clone https://github.com/YOUR-USERNAME/yourfirm-platform.git
 cd yourfirm-platform
-```
-
-Then cut it loose from the template and start your own history:
-
-```
-git remote remove origin
-git remote add origin https://github.com/YOUR-USERNAME/yourfirm-platform.git
 ```
 
 > **Windows note.** Run these in PowerShell, one line at a time, pressing enter after

@@ -28,6 +28,15 @@ wrong: the data model and the security.
 
 ---
 
+## Two ways in
+
+**Starting fresh:** click **Use this template** on GitHub. You get your own repository
+with a clean history rather than a fork tied to ours.
+
+**Already have a Lovable project and a Supabase database?** Do not start again. See
+stage 0 of `docs/getting-started.md`, which copies this into the project you already
+have. Both migrations are safe to run twice.
+
 ## Start here
 
 1. `docs/getting-started.md` - clone, rename, and get it running. About an hour.

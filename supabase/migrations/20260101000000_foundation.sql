@@ -1,14 +1,22 @@
 -- =============================================================================
 -- FOUNDATION: who you are, what you may see, and the things every table needs.
--- Run this first. Clear the SQL editor before running the next file.
+--
+-- SAFE TO RUN TWICE. Every statement is guarded, so if you already ran the
+-- foundation blocks from the install document, or you pasted this once already
+-- and were not sure it worked, run it again. Nothing breaks and nothing is lost.
+--
+-- Run this first. Clear the SQL editor completely before running the next file.
 -- =============================================================================
 
 -- ---------- roles ------------------------------------------------------------
 -- Roles live in their own table, never as a column on a profile. A role stored
 -- next to the user is a role the user can edit.
-create type public.app_role as enum ('admin', 'staff');
+do $$ begin
+  create type public.app_role as enum ('admin', 'staff');
+exception when duplicate_object then null;
+end $$;
 
-create table public.user_roles (
+create table if not exists public.user_roles (
   id         uuid primary key default gen_random_uuid(),
   user_id    uuid not null references auth.users(id) on delete cascade,
   role       public.app_role not null,
@@ -32,20 +40,30 @@ $$;
 grant execute on function public.has_role(uuid, public.app_role) to authenticated;
 grant execute on function public.is_admin() to authenticated;
 
+drop policy if exists read_own_roles on public.user_roles;
 create policy read_own_roles on public.user_roles
   for select to authenticated using (user_id = auth.uid() or public.is_admin());
+
+drop policy if exists admin_manages_roles on public.user_roles;
 create policy admin_manages_roles on public.user_roles
   for all to authenticated using (public.is_admin()) with check (public.is_admin());
+
+drop policy if exists service_roles on public.user_roles;
 create policy service_roles on public.user_roles
   for all to service_role using (true) with check (true);
 
 -- ---------- permission areas -------------------------------------------------
 -- One value per tool. Add to this list every time you build a new one and access
 -- becomes a tick box rather than a code change.
---   alter type public.app_area add value 'your_new_tool';
-create type public.app_area as enum ('clients', 'reports', 'admin');
+do $$ begin
+  create type public.app_area as enum ('clients', 'reports', 'admin');
+exception when duplicate_object then null;
+end $$;
 
-create table public.user_permissions (
+-- Adding an area later is a one-liner and it is also safe to repeat:
+--   alter type public.app_area add value if not exists 'your_new_tool';
+
+create table if not exists public.user_permissions (
   id         uuid primary key default gen_random_uuid(),
   user_id    uuid not null references auth.users(id) on delete cascade,
   area       public.app_area not null,
@@ -61,7 +79,10 @@ returns boolean language sql stable security definer set search_path = public as
       or exists (select 1 from public.user_permissions where user_id = p_user_id and area = p_area);
 $$;
 
--- Text overload so an edge function can call it without knowing the enum type.
+-- A text overload so an edge function can ask without knowing the enum type.
+-- Note this is a SECOND function, not a replacement: `create or replace` with a
+-- different argument list always adds one rather than replacing. That is
+-- deliberate here and a trap everywhere else.
 create or replace function public.has_area(p_user_id uuid, p_area text)
 returns boolean language sql stable security definer set search_path = public as $$
   select public.has_area(p_user_id, p_area::public.app_area);
@@ -88,10 +109,15 @@ grant execute on function public.has_area(uuid, public.app_area) to authenticate
 grant execute on function public.has_area(uuid, text) to authenticated;
 grant execute on function public.get_my_areas() to authenticated;
 
+drop policy if exists read_own_permissions on public.user_permissions;
 create policy read_own_permissions on public.user_permissions
   for select to authenticated using (user_id = auth.uid() or public.is_admin());
+
+drop policy if exists admin_manages_permissions on public.user_permissions;
 create policy admin_manages_permissions on public.user_permissions
   for all to authenticated using (public.is_admin()) with check (public.is_admin());
+
+drop policy if exists service_permissions on public.user_permissions;
 create policy service_permissions on public.user_permissions
   for all to service_role using (true) with check (true);
 
@@ -107,7 +133,7 @@ $$;
 -- ---------- firm settings ----------------------------------------------------
 -- One row. For anything a non-technical person should be able to change without a
 -- deployment. Build-time things (colours, fonts) belong in config/firm.config.ts.
-create table public.firm_settings (
+create table if not exists public.firm_settings (
   id                       boolean primary key default true,
   firm_name                text not null default 'Your Firm',
   financial_year_end_month smallint not null default 6,
@@ -117,12 +143,23 @@ create table public.firm_settings (
 alter table public.firm_settings enable row level security;
 insert into public.firm_settings (id) values (true) on conflict do nothing;
 
+drop policy if exists read_firm_settings on public.firm_settings;
 create policy read_firm_settings on public.firm_settings
   for select to authenticated using (true);
+
+drop policy if exists admin_writes_firm_settings on public.firm_settings;
 create policy admin_writes_firm_settings on public.firm_settings
   for all to authenticated using (public.is_admin()) with check (public.is_admin());
+
+drop policy if exists service_firm_settings on public.firm_settings;
 create policy service_firm_settings on public.firm_settings
   for all to service_role using (true) with check (true);
 
+drop trigger if exists firm_settings_updated on public.firm_settings;
 create trigger firm_settings_updated before update on public.firm_settings
   for each row execute function public.set_updated_at();
+
+-- ---------- did it work? -----------------------------------------------------
+-- Run this on its own afterwards. Three tables, all with rowsecurity = true.
+--   select tablename, rowsecurity from pg_tables
+--   where schemaname = 'public' order by tablename;
