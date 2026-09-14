@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en-AU"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Structure report - sketch</title>
+<style>
+  :root{
+    --bg:#F5F4F1; --surface:#FFFFFF; --surface-2:#EFEDE9;
+    --fg:#14140F; --fg-dim:#4C4A44; --fg-mute:#807D75;
+    --line:rgba(0,0,0,.12); --line-soft:rgba(0,0,0,.06);
+    --accent:#2F5D62; --accent-soft:#E4EDEE;
+    --good:#2F6B45; --good-soft:#E8F1EA;
+    --warn:#8A6212; --warn-soft:#FBF4E4;
+    --crit:#9B3A2C; --crit-soft:#F8ECE9;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.55 var(--sans)}
+  .app{display:grid;grid-template-columns:212px 1fr;min-height:100vh}
+  .rail{background:var(--surface);border-right:1px solid var(--line);padding:18px 0;display:flex;flex-direction:column}
+  .mark{font-weight:700;letter-spacing:-.02em;font-size:16px;padding:0 18px 18px}
+  .rail h6{margin:14px 18px 6px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-mute);font-weight:600}
+  .rail a{display:block;padding:7px 18px;color:var(--fg-dim);text-decoration:none;border-left:2px solid transparent}
+  .rail a.on{background:var(--accent-soft);border-left-color:var(--accent);color:var(--fg);font-weight:600}
+  .rail .me{margin-top:auto;padding:14px 18px 0;border-top:1px solid var(--line-soft);font-size:12px;color:var(--fg-mute)}
+
+  .head{display:flex;align-items:center;gap:12px;padding:15px 26px;border-bottom:1px solid var(--line);background:var(--surface);flex-wrap:wrap}
+  .head h1{margin:0;font-size:19px;font-weight:700}
+  .head .sp{flex:1}
+  .state{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:99px;
+    background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn)}
+  .btn{border:1px solid var(--line);background:transparent;border-radius:4px;padding:7px 13px;font:inherit;font-size:13px;cursor:pointer}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn[disabled]{opacity:.45;cursor:not-allowed}
+  main{padding:22px 26px 60px;max-width:1100px}
+
+  .gate{border:1px solid var(--crit);background:var(--crit-soft);border-radius:6px;padding:15px 18px;margin-bottom:24px}
+  .gate h3{margin:0 0 8px;font-size:14px;color:var(--crit)}
+  .gate ul{margin:0;padding-left:20px;font-size:13.5px;color:var(--fg-dim)}
+  .gate li{margin:3px 0}
+
+  h2{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-mute);margin:28px 0 10px;font-weight:700}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:860px){.two{grid-template-columns:1fr}.app{grid-template-columns:1fr}}
+  .panel h4{margin:0;padding:10px 14px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--fg-mute);border-bottom:1px solid var(--line);background:var(--surface-2)}
+  .ent{display:grid;grid-template-columns:1fr auto;gap:8px;padding:9px 14px;border-bottom:1px solid var(--line-soft);font-size:13.5px}
+  .ent:last-child{border-bottom:0}
+  .ent b{font-weight:600}
+  .ent span{display:block;font-size:11.5px;color:var(--fg-mute)}
+  .tag{font-size:10.5px;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--fg-mute);white-space:nowrap;align-self:start}
+  .tag.new{border-color:var(--good);color:var(--good);background:var(--good-soft)}
+
+  table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line);border-radius:6px}
+  th{text-align:left;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-mute);
+     padding:9px 14px;border-bottom:1px solid var(--line);font-weight:600}
+  td{padding:9px 14px;border-bottom:1px solid var(--line-soft);vertical-align:top;font-size:13.5px}
+  tr:last-child td{border-bottom:0}
+  .pill{display:inline-block;font-size:11px;padding:2px 9px;border-radius:99px;border:1px solid var(--line);color:var(--fg-dim);white-space:nowrap}
+  .pill.ok{border-color:var(--good);color:var(--good);background:var(--good-soft)}
+  .pill.na{border-color:var(--line);color:var(--fg-mute)}
+  .pill.flag{border-color:var(--crit);color:var(--crit);background:var(--crit-soft)}
+  .pill.open{border-color:var(--warn);color:var(--warn);background:var(--warn-soft)}
+  .sel{border:1px dashed var(--line);border-radius:4px;padding:3px 9px;font-size:12px;color:var(--fg-mute);background:transparent;cursor:pointer}
+
+  .sec{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px 18px;margin-bottom:12px}
+  .sec .top{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+  .sec h5{margin:0;font-size:14.5px;font-weight:700}
+  .ai{font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:99px;
+    border:1px solid var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .sec p{margin:0;font-size:13.5px;color:var(--fg-dim)}
+  .note{margin:22px 0 0;padding:12px 15px;border-left:2px solid var(--accent);background:var(--accent-soft);font-size:13px;color:var(--fg-dim);max-width:70ch}
+</style></head><body>
+<div class="app">
+  <nav class="rail">
+    <div class="mark">Your Firm</div>
+    <h6>Tools</h6>
+    <a href="#">Home</a>
+    <a href="#">Clients</a>
+    <a href="#" class="on">Structure reports</a>
+    <a href="#">Reports</a>
+    <h6>Admin</h6>
+    <a href="#">Team</a>
+    <div class="me">sam@yourfirm.com.au<br>Administrator</div>
+  </nav>
+
+  <div>
+    <div class="head">
+      <h1>Bellhaven Group &mdash; structure review</h1>
+      <span class="state">In review</span>
+      <span class="sp"></span>
+      <span style="font-size:12px;color:var(--fg-mute)">Prepared by Priya Raman &middot; v1</span>
+      <button class="btn">Draft with AI</button>
+      <button class="btn primary" disabled>Approve &amp; issue</button>
+    </div>
+
+    <main>
+      <div class="gate">
+        <h3>Four things before this can be approved</h3>
+        <ul>
+          <li>3 considerations have no decision recorded: Stamp duty, Land tax, Trust vesting date</li>
+          <li>The Risks and caveats section is empty</li>
+          <li>No reviewer is named against this report</li>
+          <li>1 consideration is flagged and needs a written position: Section 100A</li>
+        </ul>
+      </div>
+
+      <h2>The structure</h2>
+      <div class="two">
+        <div class="panel">
+          <h4>Today</h4>
+          <div class="ent"><div><b>Bellhaven Holdings Pty Ltd</b><span>Company &middot; ACN 641 882 517 &middot; holding</span></div><span class="tag">Existing</span></div>
+          <div class="ent"><div><b>Bellhaven Trading Trust</b><span>Discretionary trust &middot; operating</span></div><span class="tag">Existing</span></div>
+          <div class="ent"><div><b>M &amp; J Okonkwo</b><span>Individuals &middot; beneficiaries, 50/50</span></div><span class="tag">Existing</span></div>
+          <div class="ent"><div><b>Okonkwo Property Pty Ltd</b><span>Company &middot; holds the Robina premises</span></div><span class="tag">Existing</span></div>
+        </div>
+        <div class="panel">
+          <h4>Recommended</h4>
+          <div class="ent"><div><b>Bellhaven Holdings Pty Ltd</b><span>Unchanged &middot; becomes sole corporate beneficiary</span></div><span class="tag">Existing</span></div>
+          <div class="ent"><div><b>Bellhaven Trading Trust</b><span>Unchanged</span></div><span class="tag">Existing</span></div>
+          <div class="ent"><div><b>Okonkwo Family Trust</b><span>New discretionary trust &middot; holds the property</span></div><span class="tag new">New</span></div>
+          <div class="ent"><div><b>Bellhaven Bucket Pty Ltd</b><span>New &middot; corporate beneficiary</span></div><span class="tag new">New</span></div>
+        </div>
+      </div>
+
+      <h2>Objectives, in the client's order</h2>
+      <table>
+        <tr><th>Objective</th><th>Priority</th><th>What they actually said</th></tr>
+        <tr><td>Asset protection</td><td><span class="pill">1</span></td><td>Wants the Robina premises out of reach of the trading business</td></tr>
+        <tr><td>Succession</td><td><span class="pill">2</span></td><td>Two children, one in the business and one not</td></tr>
+        <tr><td>Tax efficiency</td><td><span class="pill">3</span></td><td>Distributions currently all to individuals at top rates</td></tr>
+      </table>
+
+      <h2>Australian considerations</h2>
+      <table>
+        <tr><th>Consideration</th><th>Decision</th><th>Note</th><th></th></tr>
+        <tr><td>Division 7A</td><td><span class="pill ok">Addressed</span></td><td>Existing loan on a complying agreement, minimum repayment met FY2026</td><td></td></tr>
+        <tr><td>Unpaid present entitlements</td><td><span class="pill ok">Addressed</span></td><td>Current law checked at date of report, position stated in the tax section</td><td></td></tr>
+        <tr><td>Section 100A</td><td><span class="pill flag">Flagged</span></td><td>Proposed distribution to the non-working child needs a written position before issue</td><td></td></tr>
+        <tr><td>CGT on restructure</td><td><span class="pill ok">Addressed</span></td><td>Transfer of the premises is a disposal, CGT calculated in the tax section</td><td></td></tr>
+        <tr><td>Rollover relief</td><td><span class="pill na">Not applicable</span></td><td>Conditions not met, turnover above the threshold</td><td></td></tr>
+        <tr><td>Small business CGT concessions</td><td><span class="pill ok">Addressed</span></td><td>Access preserved, tested against the proposed structure</td><td></td></tr>
+        <tr><td>Stamp duty</td><td><span class="pill open">No decision</span></td><td>QLD transfer duty on the premises not yet quantified</td><td><button class="sel">Decide</button></td></tr>
+        <tr><td>Land tax</td><td><span class="pill open">No decision</span></td><td>Trust surcharge not yet checked</td><td><button class="sel">Decide</button></td></tr>
+        <tr><td>Trust vesting date</td><td><span class="pill open">No decision</span></td><td></td><td><button class="sel">Decide</button></td></tr>
+      </table>
+
+      <h2>The report</h2>
+      <div class="sec">
+        <div class="top"><h5>Current structure</h5><span class="ai">AI drafted</span></div>
+        <p>The group presently operates through Bellhaven Trading Trust, a discretionary trust whose trustee is Bellhaven Holdings Pty Ltd. The Robina premises are held directly by Okonkwo Property Pty Ltd, which is owned equally by M and J Okonkwo...</p>
+      </div>
+      <div class="sec">
+        <div class="top"><h5>Recommended structure and why</h5><span class="ai">AI drafted</span></div>
+        <p>We recommend interposing a new discretionary trust to hold the premises, and introducing a corporate beneficiary to provide a distribution option taxed at the company rate. This addresses the asset protection objective by separating the property from...</p>
+      </div>
+      <div class="sec">
+        <div class="top"><h5>Tax consequences</h5><span class="ai">AI drafted</span></div>
+        <p>The transfer of the premises is a CGT event A1. On the figures provided the gross capital gain is approximately $310,000 before any discount or concession...</p>
+      </div>
+      <div class="sec">
+        <div class="top"><h5>Implementation steps</h5></div>
+        <p>Written by Priya. Seven steps, in order, with who does each and the dependency on the duty ruling.</p>
+      </div>
+      <div class="sec" style="border-color:var(--warn);background:var(--warn-soft)">
+        <div class="top"><h5>Risks and caveats</h5><span class="pill open">Empty</span></div>
+        <p>Required before approval. This is the section that says what the structure does not do.</p>
+      </div>
+
+      <p class="note"><strong>Why the gate is at the top of the screen.</strong> Three considerations with no
+      decision, an empty section and no named reviewer, and the Approve button is off. Not greyed out as a
+      hint: the database refuses the change. A control you can evidence beats a policy nobody follows, and
+      "not applicable" is always an acceptable answer. Silence is not.</p>
+    </main>
+  </div>
+</div>
+</body></html>

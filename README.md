@@ -15,6 +15,7 @@ your own Australian-hosted database, and it becomes your firm's platform.
 |---|---|
 | **The security model** | Roles and per-tool permission areas, enforced in the database rather than in the interface. Ship a new table and it is locked by default. |
 | **Module one** | Client and revenue register: every client, the group they belong to, who owns them, what they pay, and what they are on. |
+| **Module two** | Structure report: current and proposed entity structures, the client's objectives, and a drafted recommendation that cannot be approved until a named person has ruled on every Australian consideration. |
 | **The guard** | An edge function auth module that checks who is calling, because Supabase's `verify_jwt` does not. |
 | **The prompts** | The exact prompts that build the front end, in order. |
 | **The gotchas** | Every trap we already paid for, written down so you do not pay for them again. |

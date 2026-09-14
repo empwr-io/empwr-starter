@@ -100,6 +100,13 @@ whichever matches. Drop the old one deliberately.
 
 **Changing a function's return type needs a drop first.** Replace will refuse.
 
+**You cannot use a new enum value in the same transaction that added it.**
+`alter type app_area add value 'structure'` followed by a policy that casts
+`'structure'::app_area` fails with "unsafe use of new value of enum type", and a pasted
+migration file often runs as one transaction. This is why `has_area()` has a `text`
+overload: the policies pass a plain string and the cast happens inside the function at
+call time instead.
+
 **A cron that pages with OFFSET and an unstable ORDER BY silently skips rows every
 cycle.** Ties reorder between queries. Always include a tiebreaker column in the sort.
 
