@@ -17,6 +17,12 @@ history. Everything under `~/dev` and nowhere else.
 **Multi-line terminal blocks go in one line at a time.** Paste a whole block and the
 shell runs the next line before the last one finished. It looks like it worked.
 
+**A file path is not a SQL command.** Pasting
+`supabase/migrations/0001_foundation.sql` into the Supabase SQL editor gives you
+`syntax error at or near "supabase"`. The editor speaks SQL and nothing else: open the
+file, copy the contents, paste those. Obvious once you know, and it has stopped more
+than one person for a day.
+
 **A cloned folder is not always named what you expected.** Builder platforms append a
 random suffix to the repository they create, so `cd project-name` fails with a path
 error. Force the name at clone time: `git clone <url> project-name`.

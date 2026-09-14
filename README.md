@@ -37,6 +37,14 @@ with a clean history rather than a fork tied to ours.
 stage 0 of `docs/getting-started.md`, which copies this into the project you already
 have. Both migrations are safe to run twice.
 
+## Run the database without cloning anything
+
+The two migrations are plain SQL. Open a link, select all, copy, paste into the Supabase
+SQL editor, press Run. Both are safe to run twice.
+
+- [Foundation](https://raw.githubusercontent.com/empwr-io/empwr-starter/main/supabase/migrations/20260101000000_foundation.sql)
+- [Client register](https://raw.githubusercontent.com/empwr-io/empwr-starter/main/supabase/migrations/20260101000100_client_register.sql)
+
 ## Start here
 
 1. `docs/getting-started.md` - clone, rename, and get it running. About an hour.

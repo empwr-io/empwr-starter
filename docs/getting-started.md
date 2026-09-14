@@ -25,7 +25,11 @@ Both migrations are **safe to run twice**, so if you already ran the foundation 
 the install document, run the foundation migration anyway. It adds the few pieces the
 install document did not have and changes nothing that already exists.
 
-Then skip to stage 4.
+You do not have to wait for the copy to finish before running the SQL: stage 3 links
+straight to both migration files, so you can do the database first and the file copy
+whenever suits.
+
+Then skip to stage 3.
 
 ---
 
@@ -58,11 +62,35 @@ reads at the start of every session, so it is worth five minutes.
 
 ## 3. Create the database
 
-In the Supabase SQL editor, run the files in `supabase/migrations/` **in filename
-order**, one at a time.
+**A file path is not a command.** When this document says "run the foundation
+migration", it means open that file, select everything in it, copy it, and paste the
+SQL into the Supabase SQL editor. Typing the file name into the editor gives you
+`syntax error at or near "supabase"`, because the editor only speaks SQL.
 
-> **Clear the editor completely between files.** It does not separate them for you:
+You do not need the files on your machine for this. Open each link, press Ctrl+A then
+Ctrl+C, paste into the SQL editor, and press Run.
+
+1. **Foundation** - roles, permission areas, firm settings
+   <https://raw.githubusercontent.com/empwr-io/empwr-starter/main/supabase/migrations/20260101000000_foundation.sql>
+
+2. **Client register** - module one
+   <https://raw.githubusercontent.com/empwr-io/empwr-starter/main/supabase/migrations/20260101000100_client_register.sql>
+
+> **Clear the editor completely between the two.** It does not separate them for you:
 > paste the second underneath the first and it runs as one statement and fails.
+> Select all, delete, then paste the next one.
+
+Both are safe to run twice, so if you are ever unsure whether one worked, run it again.
+
+To confirm, paste this on its own and press Run. You want ten rows, every one with
+`rowsecurity` true:
+
+```sql
+select tablename, rowsecurity
+from pg_tables
+where schemaname = 'public'
+order by tablename;
+```
 
 When both have run, check Database, Tables. Every table should show row level security
 enabled. If any does not, stop and fix it before going further.
