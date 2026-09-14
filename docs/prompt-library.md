@@ -10,28 +10,49 @@ Changing a static file is free. Changing a built screen is not.
 
 ## 1. The shell
 
-> Build the application shell for an internal platform for an Australian accounting
-> firm. Read `config/firm.config.ts` for the firm's name, wordmark, accent colour and
-> terminology, and use those values rather than inventing any. This is a staff tool, not
-> a public website: nobody sees anything without signing in.
+**Front end only, and that is deliberate.** Asking for sign-in here is enough to make
+Lovable provision its own database before you have connected yours. Say nothing about
+accounts until your own Supabase is attached.
+
+> Build the front end shell for an internal staff platform called the [FIRM] Hub, for
+> [FIRM], an Australian accounting firm. Read `config/firm.config.ts` for the name,
+> wordmark, accent colour and terminology, and use those rather than inventing any.
 >
-> Layout: fixed left sidebar with the wordmark at the top, navigation grouped by
-> section, and the signed-in user plus a sign out button at the bottom. Main area to the
-> right with a slim page header showing the page title and space for page actions.
+> **Important: do not set up a backend, a database, authentication or sign-in in this
+> step. No Lovable Cloud, no Supabase, no storage, no user accounts.** Front end only,
+> with placeholder content. I am connecting my own database after this step and I do not
+> want one created for me.
 >
-> Pages for now: Home, a dashboard of cards with one per tool, and a placeholder page
-> for Clients and Reports.
+> Layout: a fixed left sidebar with the wordmark at the top, navigation grouped by
+> section, and a placeholder for the signed-in user's name at the bottom. Main content
+> area to the right with a slim page header showing the page title and space for page
+> actions on the right. Navigation: Home, Clients, Reports, and an Admin section
+> containing Team.
 >
-> Design: clean and dense, built to be read all day. A calm neutral ground, not white.
-> One accent used sparingly for primary actions and the active nav item only. Semantic
-> colour for good, warning and critical is separate from the accent and means the same
-> thing everywhere. Data in tables with tabular numbers, not in cards. Light and dark
-> from CSS variables defined in one place, and never a hex code in a component.
+> Pages: Home as a dashboard of cards, one per tool, each linking through. Then an empty
+> placeholder page for Clients, Reports and Team, each with its page header and one line
+> saying what will live there.
 >
-> Australian conventions: DD/MM/YYYY, dollars with no cents on summary screens,
-> financial years shown as FY2027 meaning the year ending 30 June 2027.
+> Design: dense and calm, built to be read all day, not a marketing page. A warm neutral
+> background, not white, with near-black text. One accent colour used only for primary
+> buttons and the active navigation item, never for status. Define every colour as a CSS
+> variable in one place and never put a hex code in a component. System sans typeface,
+> generous line height, a clear type scale. Data belongs in tables with tabular numbers
+> aligned right, not in cards. Support light and dark mode from those variables.
 >
-> No tool logic yet. Shell, navigation and empty pages only.
+> Australian conventions throughout: DD/MM/YYYY dates, dollar amounts with no cents on
+> summary screens, financial years written as FY2027 meaning the year ending 30 June
+> 2027, and Australian spelling.
+>
+> Do not build any tool logic, any form that saves, or any data fetching. Shell,
+> navigation and empty pages only.
+
+### Connect your database before prompt 2
+
+Prompt 2 is authentication, which needs somewhere to store users. **Attach your own
+Supabase project now**, before you run it: Lovable, More > Cloud, "Already have a
+Supabase project? Connect it here". If you skip this, Lovable creates and owns the
+database your clients' records will live in.
 
 ## 2. Sign in
 
