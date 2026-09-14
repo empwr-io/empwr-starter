@@ -8,6 +8,22 @@ worth more than the code.
 
 ---
 
+## Permissions
+
+**Bypass mode with a deny list, never naked bypass.** `.claude/settings.json` in this
+repo sets `defaultMode: bypassPermissions` so routine work stops interrupting you, and
+then hard-denies the handful of commands you can never take back: `sudo`, recursive
+deletes of root or home, force pushes, and `supabase db reset`. `rm`, `mv`, `chmod` and
+`supabase db push` still ask.
+
+That combination is the point. Full bypass on a machine with live credentials to your
+firm's database is not a productivity setting, it is an unsupervised agent with your
+client records. The deny list costs nothing and removes the outcomes you cannot undo.
+
+**Schema changes come from Claude Code only.** Never ask Lovable to create a table.
+Both of them can write migrations, and if both do, they diverge and the migration
+history stops describing the database. One writer.
+
 ## Environment
 
 **Never put a repository inside OneDrive, Dropbox or Google Drive.** The sync client
