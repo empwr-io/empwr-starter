@@ -17,9 +17,12 @@ folder and give it this:
 
 > Clone https://github.com/empwr-io/empwr-starter into a temporary folder outside this
 > project, then copy its `supabase/`, `src/lib/`, `config/`, `docs/` and `sketches/`
-> folders into this project. Do not overwrite anything Lovable generated, and do not
-> copy its README, .git folder or .gitignore over mine. Then tell me what you copied and
-> delete the temporary folder.
+> folders into this project, and its `CLAUDE.md` to the project root. Do not overwrite
+> anything Lovable generated, and do not copy its README, .git folder or .gitignore over
+> mine. Then tell me what you copied and delete the temporary folder.
+
+**Do not ask it to copy `.claude/`.** Claude Code refuses to write its own settings file
+and you will just get a refusal. Create that one by hand: see `docs/permissions.md`.
 
 Both migrations are **safe to run twice**, so if you already ran the foundation SQL from
 the install document, run the foundation migration anyway. It adds the few pieces the

@@ -10,19 +10,30 @@ worth more than the code.
 
 ## Permissions
 
-**Bypass mode with a deny list, never naked bypass.** `.claude/settings.json` in this
-repo sets `defaultMode: bypassPermissions` so routine work stops interrupting you, and
-then hard-denies the handful of commands you can never take back: `sudo`, recursive
-deletes of root or home, force pushes, and `supabase db reset`. `rm`, `mv`, `chmod` and
-`supabase db push` still ask.
+**`defaultMode` does nothing in a project settings file.** From Claude Code 2.1.257,
+`permissions.defaultMode` values `auto` and `bypassPermissions` only take effect from
+your user file or managed settings. Put `bypassPermissions` in `.claude/settings.json`
+and it is inert, while looking exactly like it is working. We shipped that mistake in
+this template. See `docs/permissions.md`.
 
-That combination is the point. Full bypass on a machine with live credentials to your
-firm's database is not a productivity setting, it is an unsupervised agent with your
-client records. The deny list costs nothing and removes the outcomes you cannot undo.
+**Claude Code will not write its own settings file.** The classifier refuses it as
+self-modification and no instruction lifts that, which is correct: an assistant that can
+widen its own permissions does not have any. Create `.claude/settings.json` by hand.
 
-**Schema changes come from Claude Code only.** Never ask Lovable to create a table.
-Both of them can write migrations, and if both do, they diverge and the migration
-history stops describing the database. One writer.
+**Ask rules still prompt in bypass mode**, and deny still blocks. An explicit ask rule is
+listed first among the actions no mode auto-approves. So the lists are worth more than
+the mode.
+
+**Order is deny, then ask, then allow, first match wins.** Specificity does not change
+the order, which is why `supabase db push*` on the ask list still prompts even though
+`supabase *` is allowed.
+
+**The three lists do not cover everything.** Anything matching none of them goes to the
+auto mode classifier rather than to you. Eight families run freely here, four ask, six
+are blocked, and the rest are somebody else's judgement.
+
+**Schema changes come from Claude Code only.** Never ask Lovable to create a table. Both
+can write migrations, and if both do, the history stops describing the database.
 
 ## Environment
 

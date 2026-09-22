@@ -51,7 +51,9 @@ SQL editor, press Run. Both are safe to run twice.
 1. `docs/getting-started.md` - clone, rename, and get it running. About an hour.
 2. `config/firm.config.ts` - your firm's name, colours and language. One file.
 3. `docs/prompt-library.md` - build the screens.
-4. `docs/gotchas.md` - read once before you build, again when something breaks.
+4. `docs/permissions.md` - what Claude Code may do without asking, and the one key that
+   silently does nothing in the wrong file.
+5. `docs/gotchas.md` - read once before you build, again when something breaks.
 
 ## Layout
 
