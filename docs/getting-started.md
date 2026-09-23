@@ -51,8 +51,9 @@ git clone https://github.com/YOUR-USERNAME/yourfirm-platform.git
 cd yourfirm-platform
 ```
 
-> **Windows note.** Run these in PowerShell, one line at a time, pressing enter after
-> each. Not inside VS Code, not in a browser.
+> **Which terminal.** Use the **VS Code terminal**: menu Terminal, then New Terminal. It
+> opens in your project folder, which matters later. One line at a time, pressing enter
+> after each. Where this document says "the terminal" it always means that one.
 
 ## 2. Make it yours
 

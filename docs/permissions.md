@@ -76,6 +76,20 @@ So create it by hand. In VS Code, make a `.claude` folder at the project root, a
 `settings.json` inside it, and paste the contents of
 [`docs/claude-settings.json`](claude-settings.json) unchanged.
 
+### Then check it actually loaded
+
+A settings file that is saved but not picked up looks exactly like one that is working,
+right up until it does not.
+
+1. **Save the file.** VS Code does not always autosave a new file.
+2. **Restart Claude Code.** Settings are read at startup, so an open session is still
+   running on the old rules. Close the panel and reopen it, or restart VS Code.
+3. **Run `/permissions`** in Claude Code. It lists the rules actually in force. If your
+   allow, deny and ask entries are not in that list, the file has not loaded: check it is
+   at `.claude/settings.json` in the project root, and that it is valid JSON.
+4. **Accept the workspace trust prompt** if VS Code asks. Allow rules grant capability,
+   so they only take effect in a folder you have trusted.
+
 ---
 
 ## If you do want bypass mode

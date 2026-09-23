@@ -41,6 +41,21 @@ can write migrations, and if both do, the history stops describing the database.
 fights the tooling over the same files, locks them mid-write, and corrupts project
 history. Everything under `~/dev` and nowhere else.
 
+**Use the VS Code terminal, not PowerShell from the Start menu.** The VS Code terminal
+(Terminal, New Terminal) opens in your project folder. PowerShell opened from the Start
+menu begins in `C:\Windows\system32`, and `supabase link` then tries to create
+`C:\Windows\System32\supabase\.temp` and fails. Nothing is broken, you are in the wrong
+folder. Pick one term for it in your own documentation and use that term everywhere:
+"PowerShell" and "a normal terminal" read as two different tools to somebody learning.
+
+**Every instruction needs an expected output.** "Run this" without "you should see
+`Finished supabase link.`" leaves the reader unable to tell success from silence, and
+silence is what they get most of the time. Show what working looks like.
+
+**"Run it the same way" is ambiguous for a migration.** Putting the file in
+`supabase/migrations/` and applying it to the database are two separate actions. Say
+which one you mean, every time.
+
 **Multi-line terminal blocks go in one line at a time.** Paste a whole block and the
 shell runs the next line before the last one finished. It looks like it worked.
 
