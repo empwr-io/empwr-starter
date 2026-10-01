@@ -133,11 +133,14 @@ work that caps the firm. This module does not replace the judgement. It removes 
 writing that happens before the judgement, and it makes the review step impossible to
 skip rather than merely expected.
 
-Run the migration `20260101000200_structure_report.sql` first.
+Run `20260101000200_structure_report.sql` first, then
+`20260101000201_structure_report_gate_fix.sql`. The second one is a correction to the
+first: see its header for what was wrong and why a correction has to be its own file.
 
 Then open `sketches/structure-report.html` and argue with it before you build anything.
 Note what is deliberately in that picture: three considerations with no decision, an
-empty section, no named reviewer, and a dead Approve button. Those four are the design.
+empty section, a consideration flagged with nothing written against it, no named reviewer,
+and a dead Approve button. Those are the design.
 
 ## 6. Conceptualise, before any code
 

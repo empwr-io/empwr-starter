@@ -120,6 +120,35 @@ path explicitly.
 
 ## Postgres
 
+**Every `create function` grants EXECUTE to PUBLIC, and PUBLIC includes `anon`.**
+Postgres does this silently and you will never see it unless you look. `anon` is the role
+behind your publishable key, which anybody who opens your front end already holds. On a
+`security definer` function, which runs as the table owner and therefore past row level
+security, that is a hole with your whole database behind it. Revoke, then grant back to
+the roles that need it.
+
+**`revoke all on function f from public` does not revoke a direct grant to `anon`.**
+PUBLIC and `anon` are separate grants. Revoke both, every time.
+
+**A gate that only fires when the status changes is not a gate.** Our own approval
+trigger was `before update ... when old.status is distinct from new.status`, which left
+two ways through: insert a row straight in as `approved`, or edit an already-approved row
+into a state that would never have passed. Enforce the condition, not the transition, and
+put the trigger on insert as well. Cohort zero caught this one in our file.
+
+**If the rules live in one function, call that function.** The same trigger calculated
+four blockers and then checked three of them, because the list and the enforcement were
+the same block of code. One function returns the blockers, one function asserts them, and
+the trigger calls the assert.
+
+**Child rows are not covered by a trigger on the parent.** Freezing a signed report by
+re-checking `structure_reports` does nothing about someone emptying a row in
+`structure_report_sections`, which never touches the parent table. If the contents matter,
+the trigger goes on the tables holding the contents.
+
+**`NEW` is unassigned in a `before delete` trigger.** Branch on `tg_op` and read `old`.
+`coalesce(new.x, old.x)` looks tidy and raises "record new is not assigned yet".
+
 **`create or replace function` with a different argument list creates a SECOND
 function.** It does not replace the first. Now you have two and calls resolve to
 whichever matches. Drop the old one deliberately.
@@ -135,6 +164,34 @@ call time instead.
 
 **A cron that pages with OFFSET and an unstable ORDER BY silently skips rows every
 cycle.** Ties reorder between queries. Always include a tiebreaker column in the sort.
+
+---
+
+## Migrations
+
+**A blank Remote column in `migration list` tells you about the history table, not about
+your schema.** The two can disagree. If any SQL was ever run in the browser, the tables
+exist and the history has no record of them, so `migration list` shows Local filled and
+Remote blank while the database is in fact already built. Reading that as "nothing has
+been applied" and running `db push` re-runs the whole file over live objects. Our
+migrations are idempotent so nothing breaks, but anything changed by hand since is
+quietly overwritten. **Check the schema, not just the history, before your first push:**
+
+```sql
+select tablename from pg_tables where schemaname = 'public' order by tablename;
+```
+
+If the tables are already there, use `migration repair` rather than `db push`. The route
+is in [`docs/supabase-cli.md`](supabase-cli.md).
+
+**Migrations are recorded as applied by filename, not by content.** Editing a migration
+that has already been applied changes nothing on any database that has already run it,
+and no warning is printed. A correction to an applied migration has to ship as a new
+numbered file. Fix the original too, so a fresh database gets it right first time, but do
+not expect the fix to reach an existing one.
+
+**Never apply SQL by hand once the CLI is linked.** This is the same gotcha as the first
+one, stated as a rule. One writer, one path, one history.
 
 ---
 

@@ -40,11 +40,21 @@ have. Both migrations are safe to run twice.
 
 ## Run the database without cloning anything
 
-The two migrations are plain SQL. Open a link, select all, copy, paste into the Supabase
-SQL editor, press Run. Both are safe to run twice.
+The migrations are plain SQL. Open a link, select all, copy, paste into the Supabase SQL
+editor, press Run. Clear the editor completely between each one, and run them in this
+order: each depends on the one above it. All of them are safe to run twice.
 
-- [Foundation](https://raw.githubusercontent.com/empwr-io/empwr-starter/main/supabase/migrations/20260101000000_foundation.sql)
-- [Client register](https://raw.githubusercontent.com/empwr-io/empwr-starter/main/supabase/migrations/20260101000100_client_register.sql)
+1. [Foundation](https://raw.githubusercontent.com/empwr-io/empwr-starter/main/supabase/migrations/20260101000000_foundation.sql) - roles, permission areas, firm settings
+2. [Client register](https://raw.githubusercontent.com/empwr-io/empwr-starter/main/supabase/migrations/20260101000100_client_register.sql) - module one
+3. [Structure report](https://raw.githubusercontent.com/empwr-io/empwr-starter/main/supabase/migrations/20260101000200_structure_report.sql) - module two
+4. [Structure report gate fix](https://raw.githubusercontent.com/empwr-io/empwr-starter/main/supabase/migrations/20260101000201_structure_report_gate_fix.sql) - a correction to module two
+
+Eighteen tables when all four have run. Anything else in your `public` schema came from
+somewhere other than this repo, which is worth knowing about.
+
+Doing it this way is fine to start and it is not how you want to work for long, because
+nothing records what you ran. Once you are moving, use the CLI instead:
+[`docs/supabase-cli.md`](docs/supabase-cli.md).
 
 ## Start here
 

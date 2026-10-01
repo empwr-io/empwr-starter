@@ -80,13 +80,22 @@ Ctrl+C, paste into the SQL editor, and press Run.
 2. **Client register** - module one
    <https://raw.githubusercontent.com/empwr-io/empwr-starter/main/supabase/migrations/20260101000100_client_register.sql>
 
-> **Clear the editor completely between the two.** It does not separate them for you:
+3. **Structure report** - module two, your first tool's tables
+   <https://raw.githubusercontent.com/empwr-io/empwr-starter/main/supabase/migrations/20260101000200_structure_report.sql>
+
+4. **Structure report gate fix** - a correction to module two, found by cohort zero
+   <https://raw.githubusercontent.com/empwr-io/empwr-starter/main/supabase/migrations/20260101000201_structure_report_gate_fix.sql>
+
+> **Clear the editor completely between each one.** It does not separate them for you:
 > paste the second underneath the first and it runs as one statement and fails.
 > Select all, delete, then paste the next one.
 
-Both are safe to run twice, so if you are ever unsure whether one worked, run it again.
+The order is not optional. Each file references objects created by the one above it.
 
-To confirm, paste this on its own and press Run. You want ten rows, every one with
+All of them are safe to run twice, so if you are ever unsure whether one worked, run it
+again.
+
+To confirm, paste this on its own and press Run. You want eighteen rows, every one with
 `rowsecurity` true:
 
 ```sql
@@ -96,8 +105,13 @@ where schemaname = 'public'
 order by tablename;
 ```
 
-When both have run, check Database, Tables. Every table should show row level security
-enabled. If any does not, stop and fix it before going further.
+Then check Database, Tables. Every table should show row level security enabled. If any
+does not, stop and fix it before going further.
+
+If you see **more** than eighteen tables, something other than this repo created one.
+Lovable builds tables of its own if you ask it to, which is why the house rule is that
+schema changes come from Claude Code only. Find out what it is before you build on top of
+it.
 
 ## 4. Make yourself the administrator
 
